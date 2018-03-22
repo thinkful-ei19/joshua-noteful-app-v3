@@ -76,9 +76,9 @@ describe('Noteful API - Folders', function () {
           expect(res).to.be.json;
 
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys('_id', 'name', '__v');
+          expect(res.body).to.have.keys('id', 'name');
 
-          expect(res.body._id).to.equal(data.id);
+          expect(res.body.id).to.equal(data.id);
           expect(res.body.name).to.equal(data.name);
         });
     });
@@ -123,8 +123,8 @@ describe('Noteful API - Folders', function () {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.include.keys('_id', 'name', '__v');
-          return Folder.findById(res.body._id);
+          expect(res.body).to.include.keys('id', 'name');
+          return Folder.findById(res.body.id);
         })
         .then(data=>{
           expect(res.body.name).to.equal(data.name);
@@ -185,9 +185,9 @@ describe('Noteful API - Folders', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.include.keys('_id', 'name', '__v');
+          expect(res.body).to.include.keys('id', 'name');
 
-          expect(res.body._id).to.equal(data.id);
+          expect(res.body.id).to.equal(data.id);
           expect(res.body.name).to.equal(updateItem.name);
         });
     });
