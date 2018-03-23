@@ -6,21 +6,12 @@ const router = express.Router();
 const mongoose = require('mongoose');
 
 const Tag = require('../models/tag');
+const Note = require('../models/note');
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) =>{
-  const { searchTerm } = req.query;
 
-  console.log('akhbdiq');
-
-  let filter = {};
-
-  if (searchTerm) {
-    const re = new RegExp(searchTerm, 'i');
-    filter.title = {$regex: re };
-  }
-
-  Tag.find(filter)
+  Tag.find()
     .sort('name')
     .then(results =>{
       res.json(results);
@@ -96,9 +87,8 @@ router.put('/:id', (req, res, next)=>{
   } 
 
   const updateItem = { name };
-  const options = { new:true };
 
-  Tag.findByIdAndUpdate(id, updateItem, options)
+  Tag.findByIdAndUpdate(id, updateItem, { new:true})
     .then(result =>{
       if(result) {
         res.json(result);
@@ -118,10 +108,20 @@ router.put('/:id', (req, res, next)=>{
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) =>{
   const { id } = req.params;
+  const tagRemovePromise = Tag.findByIdAndRemove(id);
 
-  Tag.findByIdAndRemove(id)
-    .then(()=>{
-      res.status(204).end();
+  const noteUpdatePromise = Note.updateMany(
+    { 'tags': id, },
+    { '$pull': { 'tags': id } }
+  );
+
+  Promise.all([tagRemovePromise, noteUpdatePromise])
+    .then(([tagResult])=>{
+      if(tagResult) {
+        res.status(204).end();
+      } else {
+        next();
+      } 
     })
     .catch(err =>{
       next(err);
