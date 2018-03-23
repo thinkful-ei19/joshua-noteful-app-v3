@@ -27,6 +27,7 @@ router.get('/', (req, res, next) => {
   }
 
   Note.find(filter)
+    .populate('tags')
     .sort('created')
     .then(results => {
       res.json(results);
@@ -49,6 +50,7 @@ router.get('/:id', (req, res, next) => {
 
 
   Note.findById(id)
+    .populate('tags')
     .then(result => {
       if (result) {
         res.json(result);
@@ -70,6 +72,16 @@ router.post('/', (req, res, next) => {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
+  }
+
+  if(tags) {
+    tags.forEach((tag)=>{
+      if(!mongoose.Types.ObjectId.isValid(tag)){
+        const err = new Error('The `id` is not valid');
+        err.status = 400;
+        return next(err);
+      }
+    });
   }
 
   const newItem = { title, content, folderId, tags };
