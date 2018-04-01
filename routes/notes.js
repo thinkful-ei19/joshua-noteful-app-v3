@@ -23,7 +23,7 @@ router.get('/', (req, res, next) => {
   }
 
   if(tagId){
-    filter.tagId = tagId;
+    filter.tags = tagId;
   }
 
   Note.find(filter)
